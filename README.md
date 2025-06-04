@@ -43,6 +43,43 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+## 🔧 Repository Setup
+
+**Important:** To enable PR comments and full functionality, you need to configure your repository permissions:
+
+### Required GitHub Repository Settings
+
+1. **Workflow Permissions** (Settings → Actions → General → Workflow permissions):
+
+   - Select **"Read and write permissions"**
+   - ✅ Check **"Allow GitHub Actions to create and approve pull requests"**
+
+2. **Why these permissions are needed:**
+   - **Read and write permissions**: Allows the action to post comments on pull requests
+   - **Create and approve pull requests**: Enables the action to interact with PR comments and reviews
+
+### Without these settings enabled:
+
+- ❌ You'll see: `HttpError: Resource not accessible by integration`
+- ❌ No PR comments will be created
+- ✅ Analysis will still run and output results to the workflow logs
+
+### Alternative Permission Configuration
+
+If you prefer more granular control, you can add explicit permissions to your workflow:
+
+```yaml
+jobs:
+  svelte-migration:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      # ... rest of your workflow
+```
+
 ## 📋 What It Detects
 
 The action identifies common Svelte 4 patterns that need updating:
