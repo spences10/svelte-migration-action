@@ -172,10 +172,9 @@ export class GitHubService {
 					path: issue.file,
 					start_line: issue.line,
 					end_line: issue.line,
-					annotation_level:
-						issue.severity === 'error'
-							? 'failure'
-							: ('warning' as const),
+					annotation_level: (issue.severity === 'error'
+						? 'failure'
+						: 'warning') as 'failure' | 'warning' | 'notice',
 					message: issue.message,
 				}));
 

@@ -3,27 +3,27 @@ import type { MigrationIssue } from './analyser';
 import { AnthropicService } from './anthropic-service';
 
 // Mock the Anthropic SDK
-const mockAnthropicClient = {
+const mock_anthropic_client = {
 	messages: {
 		create: vi.fn(),
 	},
 };
 
 vi.mock('@anthropic-ai/sdk', () => ({
-	default: vi.fn(() => mockAnthropicClient),
+	default: vi.fn(() => mock_anthropic_client),
 }));
 
 describe('AnthropicService', () => {
-	let anthropicService: AnthropicService;
+	let anthropic_service: AnthropicService;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		anthropicService = new AnthropicService('fake-api-key');
+		anthropic_service = new AnthropicService('fake-api-key');
 	});
 
 	describe('analyzeSvelteFile', () => {
-		it('should analyze a Svelte file and return suggestions', async () => {
-			const mockResponse = {
+		it('should analyse a Svelte file and return suggestions', async () => {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
@@ -37,8 +37,8 @@ describe('AnthropicService', () => {
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
 			const issues: MigrationIssue[] = [
 				{
@@ -58,7 +58,7 @@ describe('AnthropicService', () => {
 				},
 			];
 
-			const result = await anthropicService.analyzeSvelteFile(
+			const result = await anthropic_service.analyzeSvelteFile(
 				'test.svelte',
 				'<script>export let name;</script>',
 				issues,
@@ -79,7 +79,7 @@ describe('AnthropicService', () => {
 			);
 
 			expect(
-				mockAnthropicClient.messages.create,
+				mock_anthropic_client.messages.create,
 			).toHaveBeenCalledWith({
 				model: 'claude-3-5-sonnet-20241022',
 				max_tokens: 4000,
@@ -96,7 +96,7 @@ describe('AnthropicService', () => {
 		});
 
 		it('should handle empty response from Claude', async () => {
-			const mockResponse = {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
@@ -106,10 +106,10 @@ describe('AnthropicService', () => {
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
-			const result = await anthropicService.analyzeSvelteFile(
+			const result = await anthropic_service.analyzeSvelteFile(
 				'test.svelte',
 				'<script>let name;</script>',
 				[],
@@ -120,7 +120,7 @@ describe('AnthropicService', () => {
 		});
 
 		it('should filter out very short suggestions', async () => {
-			const mockResponse = {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
@@ -131,10 +131,10 @@ describe('AnthropicService', () => {
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
-			const result = await anthropicService.analyzeSvelteFile(
+			const result = await anthropic_service.analyzeSvelteFile(
 				'test.svelte',
 				'<script>export let name;</script>',
 				[],
@@ -148,23 +148,23 @@ describe('AnthropicService', () => {
 
 		it('should handle API errors', async () => {
 			vi.mocked(
-				mockAnthropicClient.messages.create,
+				mock_anthropic_client.messages.create,
 			).mockRejectedValue(new Error('API rate limit exceeded'));
 
 			await expect(
-				anthropicService.analyzeSvelteFile(
+				anthropic_service.analyzeSvelteFile(
 					'test.svelte',
 					'<script></script>',
 					[],
 					[],
 				),
 			).rejects.toThrow(
-				'Failed to analyze with Claude: Error: API rate limit exceeded',
+				'Failed to analyse with Claude: Error: API rate limit exceeded',
 			);
 		});
 
 		it('should handle non-text response content', async () => {
-			const mockResponse = {
+			const mock_response = {
 				content: [
 					{
 						type: 'image',
@@ -174,10 +174,10 @@ describe('AnthropicService', () => {
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
-			const result = await anthropicService.analyzeSvelteFile(
+			const result = await anthropic_service.analyzeSvelteFile(
 				'test.svelte',
 				'<script>export let name;</script>',
 				[],
@@ -189,23 +189,23 @@ describe('AnthropicService', () => {
 	});
 
 	describe('getSvelteComponentSuggestions', () => {
-		it('should return modernized code and migration steps', async () => {
-			const mockResponse = {
+		it('should return modernised code and migration steps', async () => {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
-						text: `**MODERNIZED CODE:**
+						text: `**MODERNISED CODE:**
 \`\`\`svelte
 <script>
   let { name } = $props();
   let count = $state(0);
   
-  function handleClick() {
+  function handle_click() {
     count++;
   }
 </script>
 
-<button onclick={handleClick}>
+<button onclick={handle_click}>
   {name}: {count}
 </button>
 \`\`\`
@@ -220,56 +220,56 @@ describe('AnthropicService', () => {
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
-			const componentContent = `
+			const component_content = `
 <script>
   export let name;
   let count = 0;
   
-  function handleClick() {
+  function handle_click() {
     count++;
   }
 </script>
 
-<button on:click={handleClick}>
+<button on:click={handle_click}>
   {name}: {count}
 </button>
 `;
 
 			const result =
-				await anthropicService.getSvelteComponentSuggestions(
-					componentContent,
+				await anthropic_service.getSvelteComponentSuggestions(
+					component_content,
 				);
 
-			expect(result.modernizedCode).toContain(
+			expect(result.modernised_code).toContain(
 				'let { name } = $props()',
 			);
-			expect(result.modernizedCode).toContain(
+			expect(result.modernised_code).toContain(
 				'let count = $state(0)',
 			);
-			expect(result.modernizedCode).toContain(
-				'onclick={handleClick}',
+			expect(result.modernised_code).toContain(
+				'onclick={handle_click}',
 			);
 
-			expect(result.migrationSteps).toHaveLength(4);
-			expect(result.migrationSteps[0]).toContain(
+			expect(result.migration_steps).toHaveLength(4);
+			expect(result.migration_steps[0]).toContain(
 				'Replace export let with $props()',
 			);
-			expect(result.migrationSteps[1]).toContain(
+			expect(result.migration_steps[1]).toContain(
 				'Convert reactive variables to $state()',
 			);
-			expect(result.migrationSteps[2]).toContain(
+			expect(result.migration_steps[2]).toContain(
 				'Update event handlers from on:click to onclick',
 			);
-			expect(result.migrationSteps[3]).toContain(
+			expect(result.migration_steps[3]).toContain(
 				'Remove createEventDispatcher',
 			);
 		});
 
 		it('should handle malformed response', async () => {
-			const mockResponse = {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
@@ -279,24 +279,24 @@ describe('AnthropicService', () => {
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
 			const result =
-				await anthropicService.getSvelteComponentSuggestions(
+				await anthropic_service.getSvelteComponentSuggestions(
 					'<script>export let name;</script>',
 				);
 
-			expect(result.modernizedCode).toBe('');
-			expect(result.migrationSteps).toEqual([]);
+			expect(result.modernised_code).toBe('');
+			expect(result.migration_steps).toEqual([]);
 		});
 
 		it('should handle response with missing sections', async () => {
-			const mockResponse = {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
-						text: `**MODERNIZED CODE:**
+						text: `**MODERNISED CODE:**
 \`\`\`svelte
 <script>let { name } = $props();</script>
 \`\`\`
@@ -307,27 +307,27 @@ Some other text without migration steps section.`,
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
 			const result =
-				await anthropicService.getSvelteComponentSuggestions(
+				await anthropic_service.getSvelteComponentSuggestions(
 					'<script>export let name;</script>',
 				);
 
-			expect(result.modernizedCode).toContain(
+			expect(result.modernised_code).toContain(
 				'let { name } = $props()',
 			);
-			expect(result.migrationSteps).toEqual([]);
+			expect(result.migration_steps).toEqual([]);
 		});
 
 		it('should handle API errors for component suggestions', async () => {
 			vi.mocked(
-				mockAnthropicClient.messages.create,
+				mock_anthropic_client.messages.create,
 			).mockRejectedValue(new Error('Network error'));
 
 			await expect(
-				anthropicService.getSvelteComponentSuggestions(
+				anthropic_service.getSvelteComponentSuggestions(
 					'<script>export let name;</script>',
 				),
 			).rejects.toThrow(
@@ -336,25 +336,25 @@ Some other text without migration steps section.`,
 		});
 
 		it('should use correct model and parameters', async () => {
-			const mockResponse = {
+			const mock_response = {
 				content: [
 					{
 						type: 'text',
-						text: '**MODERNIZED CODE:**\n```svelte\n<script></script>\n```\n\n**MIGRATION STEPS:**\n1. Test step',
+						text: '**MODERNISED CODE:**\n```svelte\n<script></script>\n```\n\n**MIGRATION STEPS:**\n1. Test step',
 					},
 				],
 			};
 
 			vi.mocked(
-				mockAnthropicClient.messages.create,
-			).mockResolvedValue(mockResponse);
+				mock_anthropic_client.messages.create,
+			).mockResolvedValue(mock_response);
 
-			await anthropicService.getSvelteComponentSuggestions(
+			await anthropic_service.getSvelteComponentSuggestions(
 				'<script>export let name;</script>',
 			);
 
 			expect(
-				mockAnthropicClient.messages.create,
+				mock_anthropic_client.messages.create,
 			).toHaveBeenCalledWith({
 				model: 'claude-3-5-sonnet-20241022',
 				max_tokens: 6000,
@@ -372,7 +372,7 @@ Some other text without migration steps section.`,
 	});
 
 	describe('constructor', () => {
-		it('should initialize with API key', () => {
+		it('should initialise with API key', () => {
 			const service = new AnthropicService('test-key');
 			expect(service).toBeInstanceOf(AnthropicService);
 		});

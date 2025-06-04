@@ -24138,6 +24138,12 @@ var require_brace_expansion = __commonJS({
 });
 
 // src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  generate_summary: () => generate_summary,
+  run: () => run
+});
+module.exports = __toCommonJS(index_exports);
 var core2 = __toESM(require_core());
 var github2 = __toESM(require_github());
 
@@ -30592,6 +30598,7 @@ var SvelteMigrationAnalyser = class {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const lineNumber = i + 1;
+      if (!line) continue;
       for (const pattern of patterns) {
         const matches = line.match(pattern.regex);
         if (matches) {
@@ -34607,17 +34614,18 @@ var AnthropicService = class {
           }
         ]
       });
-      const responseText = response.content[0].type === "text" ? response.content[0].text : "";
+      const firstContent = response.content?.[0];
+      const responseText = firstContent?.type === "text" && "text" in firstContent ? firstContent.text : "";
       return this.parseClaudeSuggestions(responseText);
     } catch (error2) {
       console.error("Anthropic API error:", error2);
-      throw new Error(`Failed to analyze with Claude: ${error2}`);
+      throw new Error(`Failed to analyse with Claude: ${error2}`);
     }
   }
   createAnalysisPrompt(filename, content, issues, warnings) {
-    return `You are an expert Svelte developer specializing in migrating from Svelte 4 to Svelte 5. 
+    return `You are an expert Svelte developer specialising in migrating from Svelte 4 to Svelte 5. 
 
-I need you to analyze this Svelte file and provide specific, actionable migration suggestions.
+I need you to analyse this Svelte file and provide specific, actionable migration suggestions.
 
 **File:** ${filename}
 
@@ -34677,7 +34685,7 @@ ${componentContent}
 \`\`\`
 
 Please provide:
-1. The fully modernized Svelte 5 version of this component
+1. The fully modernised Svelte 5 version of this component
 2. A step-by-step migration guide
 
 Use these Svelte 5 patterns:
@@ -34690,9 +34698,9 @@ Use these Svelte 5 patterns:
 - Callback props instead of createEventDispatcher
 
 Format as:
-**MODERNIZED CODE:**
+**MODERNISED CODE:**
 \`\`\`svelte
-[modernized component here]
+[modernised component here]
 \`\`\`
 
 **MIGRATION STEPS:**
@@ -34711,8 +34719,9 @@ Format as:
           }
         ]
       });
-      const responseText = response.content[0].type === "text" ? response.content[0].text : "";
-      return this.parseModernizationResponse(responseText);
+      const firstContent = response.content?.[0];
+      const responseText = firstContent?.type === "text" && "text" in firstContent ? firstContent.text : "";
+      return this.parseModernisationResponse(responseText);
     } catch (error2) {
       console.error("Anthropic API error:", error2);
       throw new Error(
@@ -34720,19 +34729,19 @@ Format as:
       );
     }
   }
-  parseModernizationResponse(response) {
-    const modernizedCodeMatch = response.match(
-      /\*\*MODERNIZED CODE:\*\*[\s\S]*?```svelte\n([\s\S]*?)\n```/
+  parseModernisationResponse(response) {
+    const modernised_code_match = response.match(
+      /\*\*MODERNISED CODE:\*\*[\s\S]*?```svelte\n([\s\S]*?)\n```/
     );
-    const modernizedCode = modernizedCodeMatch ? modernizedCodeMatch[1].trim() : "";
-    const migrationStepsMatch = response.match(
+    const modernised_code = modernised_code_match?.[1]?.trim() || "";
+    const migration_steps_match = response.match(
       /\*\*MIGRATION STEPS:\*\*\n([\s\S]*)/
     );
-    const migrationStepsText = migrationStepsMatch ? migrationStepsMatch[1] : "";
-    const migrationSteps = migrationStepsText.split("\n").filter((line) => /^\d+\./.test(line.trim())).map((line) => line.trim());
+    const migration_steps_text = migration_steps_match?.[1] || "";
+    const migration_steps = migration_steps_text.split("\n").filter((line) => /^\d+\./.test(line.trim())).map((line) => line.trim());
     return {
-      modernizedCode,
-      migrationSteps
+      modernised_code,
+      migration_steps
     };
   }
 };
@@ -35064,7 +35073,14 @@ function generate_summary(results, total_issues, total_warnings) {
 `;
   return summary;
 }
-run();
+if (require.main === module) {
+  run();
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  generate_summary,
+  run
+});
 /*! Bundled license information:
 
 undici/lib/fetch/body.js:

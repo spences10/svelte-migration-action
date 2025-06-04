@@ -95,6 +95,8 @@ export class SvelteMigrationAnalyser {
 			const line = lines[i];
 			const lineNumber = i + 1;
 
+			if (!line) continue;
+
 			for (const pattern of patterns) {
 				const matches = line.match(pattern.regex);
 				if (matches) {

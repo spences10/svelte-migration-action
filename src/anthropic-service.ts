@@ -37,14 +37,15 @@ export class AnthropicService {
 			});
 
 			// Extract suggestions from Claude's response
+			const firstContent = response.content?.[0];
 			const responseText =
-				response.content[0].type === 'text'
-					? response.content[0].text
+				firstContent?.type === 'text' && 'text' in firstContent
+					? firstContent.text
 					: '';
 			return this.parseClaudeSuggestions(responseText);
 		} catch (error) {
 			console.error('Anthropic API error:', error);
-			throw new Error(`Failed to analyze with Claude: ${error}`);
+			throw new Error(`Failed to analyse with Claude: ${error}`);
 		}
 	}
 
@@ -54,9 +55,9 @@ export class AnthropicService {
 		issues: MigrationIssue[],
 		warnings: MigrationIssue[],
 	): string {
-		return `You are an expert Svelte developer specializing in migrating from Svelte 4 to Svelte 5. 
+		return `You are an expert Svelte developer specialising in migrating from Svelte 4 to Svelte 5. 
 
-I need you to analyze this Svelte file and provide specific, actionable migration suggestions.
+I need you to analyse this Svelte file and provide specific, actionable migration suggestions.
 
 **File:** ${filename}
 
@@ -117,8 +118,8 @@ Format your response as a numbered list of actionable suggestions. Be specific a
 	async getSvelteComponentSuggestions(
 		componentContent: string,
 	): Promise<{
-		modernizedCode: string;
-		migrationSteps: string[];
+		modernised_code: string;
+		migration_steps: string[];
 	}> {
 		const prompt = `You are a Svelte 5 migration expert. Convert this Svelte 4 component to modern Svelte 5 syntax.
 
@@ -128,7 +129,7 @@ ${componentContent}
 \`\`\`
 
 Please provide:
-1. The fully modernized Svelte 5 version of this component
+1. The fully modernised Svelte 5 version of this component
 2. A step-by-step migration guide
 
 Use these Svelte 5 patterns:
@@ -141,9 +142,9 @@ Use these Svelte 5 patterns:
 - Callback props instead of createEventDispatcher
 
 Format as:
-**MODERNIZED CODE:**
+**MODERNISED CODE:**
 \`\`\`svelte
-[modernized component here]
+[modernised component here]
 \`\`\`
 
 **MIGRATION STEPS:**
@@ -164,11 +165,12 @@ Format as:
 				],
 			});
 
+			const firstContent = response.content?.[0];
 			const responseText =
-				response.content[0].type === 'text'
-					? response.content[0].text
+				firstContent?.type === 'text' && 'text' in firstContent
+					? firstContent.text
 					: '';
-			return this.parseModernizationResponse(responseText);
+			return this.parseModernisationResponse(responseText);
 		} catch (error) {
 			console.error('Anthropic API error:', error);
 			throw new Error(
@@ -177,32 +179,28 @@ Format as:
 		}
 	}
 
-	private parseModernizationResponse(response: string): {
-		modernizedCode: string;
-		migrationSteps: string[];
+	private parseModernisationResponse(response: string): {
+		modernised_code: string;
+		migration_steps: string[];
 	} {
-		const modernizedCodeMatch = response.match(
-			/\*\*MODERNIZED CODE:\*\*[\s\S]*?```svelte\n([\s\S]*?)\n```/,
+		const modernised_code_match = response.match(
+			/\*\*MODERNISED CODE:\*\*[\s\S]*?```svelte\n([\s\S]*?)\n```/,
 		);
-		const modernizedCode = modernizedCodeMatch
-			? modernizedCodeMatch[1].trim()
-			: '';
+		const modernised_code = modernised_code_match?.[1]?.trim() || '';
 
-		const migrationStepsMatch = response.match(
+		const migration_steps_match = response.match(
 			/\*\*MIGRATION STEPS:\*\*\n([\s\S]*)/,
 		);
-		const migrationStepsText = migrationStepsMatch
-			? migrationStepsMatch[1]
-			: '';
+		const migration_steps_text = migration_steps_match?.[1] || '';
 
-		const migrationSteps = migrationStepsText
+		const migration_steps = migration_steps_text
 			.split('\n')
 			.filter((line) => /^\d+\./.test(line.trim()))
 			.map((line) => line.trim());
 
 		return {
-			modernizedCode,
-			migrationSteps,
+			modernised_code,
+			migration_steps,
 		};
 	}
 }
