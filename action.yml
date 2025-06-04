@@ -1,0 +1,74 @@
+name: "Svelte Migration Analysis"
+description: "Analyze Svelte files to detect Svelte 4 patterns in Svelte 5 projects and provide migration guidance"
+author: "Svelte Migration Team"
+
+branding:
+  icon: "search"
+  color: "orange"
+
+inputs:
+  github-token:
+    description: "GitHub token for API access"
+    required: false
+    default: ${{ github.token }}
+
+  filter-changed-files:
+    description: "Only analyze files that changed in the pull request"
+    required: false
+    default: "true"
+
+  fail-on-error:
+    description: "Fail the action if migration issues are found"
+    required: false
+    default: "false"
+
+  fail-on-warning:
+    description: "Fail the action if migration warnings are found"
+    required: false
+    default: "false"
+
+  paths:
+    description: "Paths to search for Svelte files (one per line)"
+    required: false
+    default: |
+      src
+      app
+      lib
+
+  exclude-paths:
+    description: "Paths to exclude from analysis (one per line)"
+    required: false
+    default: |
+      node_modules
+      .git
+      dist
+      build
+
+  anthropic-api-key:
+    description: "Anthropic API key for Claude analysis (optional)"
+    required: false
+
+  enable-ai-analysis:
+    description: "Enable AI-powered analysis using Claude"
+    required: false
+    default: "false"
+
+outputs:
+  issues-found:
+    description: "Number of migration issues found"
+
+  warnings-found:
+    description: "Number of migration warnings found"
+
+  files-analyzed:
+    description: "Number of files analyzed"
+
+  has-issues:
+    description: "Whether any issues were found"
+
+  summary:
+    description: "Summary of the analysis"
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
