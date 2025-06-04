@@ -210,24 +210,49 @@ When the action runs, it will:
 
 These are breaking changes that must be addressed for Svelte 5:
 
-### 📄 `src/components/Modal.svelte`
+<details>
+<summary>📄 <code>src/components/Modal.svelte</code> - 1 issue</summary>
 
 - **Line 15:** createEventDispatcher is deprecated in Svelte 5
   - 💡 **Suggestion:** Use callback props instead of createEventDispatcher
 
-### 📄 `src/routes/+page.svelte`
+</details>
+
+<details>
+<summary>📄 <code>src/routes/+page.svelte</code> - 2 issues</summary>
 
 - **Line 23:** beforeUpdate/afterUpdate are deprecated in Svelte 5
   - 💡 **Suggestion:** Use $effect.pre() and $effect() instead
+- **Line 30:** $$props and $$restProps are deprecated
+  - 💡 **Suggestion:** Use destructuring with rest in $props(): let { foo, ...rest } = $props()
+
+</details>
 
 ## ⚠️ Warnings (8)
 
 These patterns will still work but are deprecated in Svelte 5:
 
-### 📄 `src/components/Button.svelte`
+<details>
+<summary>📄 <code>src/components/Button.svelte</code> - 5 warnings</summary>
 
 - **Line 5:** export let should be replaced with $props()
   - 💡 **Suggestion:** Replace with: let { propName } = $props()
+- **Line 10:** Reactive statement ($:) should be replaced with $derived or $effect
+  - 💡 **Suggestion:** Use $derived for computed values or $effect for side effects
+- **Line 22:** on: event directives should be replaced with event properties
+  - 💡 **Suggestion:** Replace on:click with onclick
+
+</details>
+
+<details>
+<summary>📄 <code>src/components/Input.svelte</code> - 3 warnings</summary>
+
+- **Line 8:** export let should be replaced with $props()
+  - 💡 **Suggestion:** Replace with: let { propName } = $props()
+- **Line 15:** Named slots should be replaced with snippets
+  - 💡 **Suggestion:** Use {#snippet name()} and {@render name()} instead
+
+</details>
 
 ## 📚 Migration Resources
 
