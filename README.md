@@ -43,6 +43,43 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+## 🔧 Repository Setup
+
+**Important:** To enable PR comments and full functionality, you need to configure your repository permissions:
+
+### Required GitHub Repository Settings
+
+1. **Workflow Permissions** (Settings → Actions → General → Workflow permissions):
+
+   - Select **"Read and write permissions"**
+   - ✅ Check **"Allow GitHub Actions to create and approve pull requests"**
+
+2. **Why these permissions are needed:**
+   - **Read and write permissions**: Allows the action to post comments on pull requests
+   - **Create and approve pull requests**: Enables the action to interact with PR comments and reviews
+
+### Without these settings enabled:
+
+- ❌ You'll see: `HttpError: Resource not accessible by integration`
+- ❌ No PR comments will be created
+- ✅ Analysis will still run and output results to the workflow logs
+
+### Alternative Permission Configuration
+
+If you prefer more granular control, you can add explicit permissions to your workflow:
+
+```yaml
+jobs:
+  svelte-migration:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      # ... rest of your workflow
+```
+
 ## 📋 What It Detects
 
 The action identifies common Svelte 4 patterns that need updating:
@@ -173,24 +210,49 @@ When the action runs, it will:
 
 These are breaking changes that must be addressed for Svelte 5:
 
-### 📄 `src/components/Modal.svelte`
+<details>
+<summary>📄 <code>src/components/Modal.svelte</code> - 1 issue</summary>
 
 - **Line 15:** createEventDispatcher is deprecated in Svelte 5
   - 💡 **Suggestion:** Use callback props instead of createEventDispatcher
 
-### 📄 `src/routes/+page.svelte`
+</details>
+
+<details>
+<summary>📄 <code>src/routes/+page.svelte</code> - 2 issues</summary>
 
 - **Line 23:** beforeUpdate/afterUpdate are deprecated in Svelte 5
   - 💡 **Suggestion:** Use $effect.pre() and $effect() instead
+- **Line 30:** $$props and $$restProps are deprecated
+  - 💡 **Suggestion:** Use destructuring with rest in $props(): let { foo, ...rest } = $props()
+
+</details>
 
 ## ⚠️ Warnings (8)
 
 These patterns will still work but are deprecated in Svelte 5:
 
-### 📄 `src/components/Button.svelte`
+<details>
+<summary>📄 <code>src/components/Button.svelte</code> - 5 warnings</summary>
 
 - **Line 5:** export let should be replaced with $props()
   - 💡 **Suggestion:** Replace with: let { propName } = $props()
+- **Line 10:** Reactive statement ($:) should be replaced with $derived or $effect
+  - 💡 **Suggestion:** Use $derived for computed values or $effect for side effects
+- **Line 22:** on: event directives should be replaced with event properties
+  - 💡 **Suggestion:** Replace on:click with onclick
+
+</details>
+
+<details>
+<summary>📄 <code>src/components/Input.svelte</code> - 3 warnings</summary>
+
+- **Line 8:** export let should be replaced with $props()
+  - 💡 **Suggestion:** Replace with: let { propName } = $props()
+- **Line 15:** Named slots should be replaced with snippets
+  - 💡 **Suggestion:** Use {#snippet name()} and {@render name()} instead
+
+</details>
 
 ## 📚 Migration Resources
 
