@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+.svelte-kit/
+
+# Generated files
+coverage/
+*.tsbuildinfo
+
+# Git
+.git/
+
+# Environment files
+.env*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Changesets
+.changeset/
+
+# Test outputs
+test-results/
+playwright-report/ 
