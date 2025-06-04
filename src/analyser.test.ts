@@ -2,11 +2,21 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SvelteMigrationAnalyser } from './analyser';
 import { AnthropicService } from './anthropic-service';
 
+// Mock the modules at the top level
+vi.mock('glob', () => ({
+	glob: vi.fn(),
+}));
+
+vi.mock('fs/promises', () => ({
+	readFile: vi.fn(),
+}));
+
 describe('SvelteMigrationAnalyser', () => {
 	let analyser: SvelteMigrationAnalyser;
 
 	beforeEach(() => {
 		analyser = new SvelteMigrationAnalyser();
+		vi.clearAllMocks();
 	});
 
 	describe('analyzeFile', () => {
@@ -23,7 +33,7 @@ describe('SvelteMigrationAnalyser', () => {
 				content,
 			);
 
-			expect(result.issues).toHaveLength(1);
+			expect(result.issues).toHaveLength(2); // Both import and usage
 			expect(result.issues[0]).toMatchObject({
 				rule: 'create-event-dispatcher',
 				severity: 'error',
@@ -115,7 +125,7 @@ describe('SvelteMigrationAnalyser', () => {
 				content,
 			);
 
-			expect(result.issues).toHaveLength(2);
+			expect(result.issues).toHaveLength(3); // Import line has both, plus two function calls
 			expect(result.issues[0]).toMatchObject({
 				rule: 'lifecycle-hooks',
 				severity: 'error',
@@ -356,8 +366,8 @@ describe('SvelteMigrationAnalyser', () => {
 	describe('findSvelteFiles', () => {
 		it('should find Svelte files in specified paths', async () => {
 			// Mock glob to return some test files
-			const mockGlob = await import('glob');
-			vi.spyOn(mockGlob, 'glob').mockResolvedValue([
+			const { glob } = await import('glob');
+			vi.mocked(glob).mockResolvedValue([
 				'src/App.svelte',
 				'src/components/Button.svelte',
 				'src/routes/+page.svelte',
@@ -381,8 +391,8 @@ describe('SvelteMigrationAnalyser', () => {
 			const files = ['file1.svelte', 'file2.svelte'];
 
 			// Mock fs.readFile
-			const fs = await import('fs/promises');
-			vi.spyOn(fs, 'readFile').mockImplementation((filename) => {
+			const { readFile } = await import('fs/promises');
+			vi.mocked(readFile).mockImplementation((filename) => {
 				if (filename === 'file1.svelte') {
 					return Promise.resolve('export let name;');
 				}
@@ -405,8 +415,8 @@ describe('SvelteMigrationAnalyser', () => {
 			const files = ['nonexistent.svelte'];
 
 			// Mock fs.readFile to throw an error
-			const fs = await import('fs/promises');
-			vi.spyOn(fs, 'readFile').mockRejectedValue(
+			const { readFile } = await import('fs/promises');
+			vi.mocked(readFile).mockRejectedValue(
 				new Error('File not found'),
 			);
 

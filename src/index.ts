@@ -4,7 +4,7 @@ import { SvelteMigrationAnalyser } from './analyser';
 import { AnthropicService } from './anthropic-service';
 import { GitHubService } from './github-service';
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
 	try {
 		// Get inputs
 		const github_token = core.getInput('github-token');
@@ -128,7 +128,7 @@ async function run(): Promise<void> {
 	}
 }
 
-function generate_summary(
+export function generate_summary(
 	results: any[],
 	total_issues: number,
 	total_warnings: number,
@@ -206,4 +206,7 @@ function generate_summary(
 	return summary;
 }
 
-run();
+// Only run if this is the main module (not during testing)
+if (require.main === module) {
+	run();
+}
