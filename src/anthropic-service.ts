@@ -1,61 +1,70 @@
-import Anthropic from '@anthropic-ai/sdk'
-import { MigrationIssue } from './analyzer'
+import Anthropic from '@anthropic-ai/sdk';
+import { MigrationIssue } from './analyser';
 
 export class AnthropicService {
-  private client: Anthropic
+	private client: Anthropic;
 
-  constructor(apiKey: string) {
-    this.client = new Anthropic({
-      apiKey
-    })
-  }
+	constructor(apiKey: string) {
+		this.client = new Anthropic({
+			apiKey,
+		});
+	}
 
-  async analyzeSvelteFile(
-    filename: string, 
-    content: string, 
-    issues: MigrationIssue[], 
-    warnings: MigrationIssue[]
-  ): Promise<string[]> {
-    const prompt = this.createAnalysisPrompt(filename, content, issues, warnings)
+	async analyzeSvelteFile(
+		filename: string,
+		content: string,
+		issues: MigrationIssue[],
+		warnings: MigrationIssue[],
+	): Promise<string[]> {
+		const prompt = this.createAnalysisPrompt(
+			filename,
+			content,
+			issues,
+			warnings,
+		);
 
-    try {
-      const response = await this.client.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 4000,
-        temperature: 0.1,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
+		try {
+			const response = await this.client.messages.create({
+				model: 'claude-3-5-sonnet-20241022',
+				max_tokens: 4000,
+				temperature: 0.1,
+				messages: [
+					{
+						role: 'user',
+						content: prompt,
+					},
+				],
+			});
 
-      // Extract suggestions from Claude's response
-      const responseText = response.content[0].type === 'text' ? response.content[0].text : ''
-      return this.parseClaudeSuggestions(responseText)
+			// Extract suggestions from Claude's response
+			const responseText =
+				response.content[0].type === 'text'
+					? response.content[0].text
+					: '';
+			return this.parseClaudeSuggestions(responseText);
+		} catch (error) {
+			console.error('Anthropic API error:', error);
+			throw new Error(`Failed to analyze with Claude: ${error}`);
+		}
+	}
 
-    } catch (error) {
-      console.error('Anthropic API error:', error)
-      throw new Error(`Failed to analyze with Claude: ${error}`)
-    }
-  }
-
-  private createAnalysisPrompt(
-    filename: string, 
-    content: string, 
-    issues: MigrationIssue[], 
-    warnings: MigrationIssue[]
-  ): string {
-    return `You are an expert Svelte developer specializing in migrating from Svelte 4 to Svelte 5. 
+	private createAnalysisPrompt(
+		filename: string,
+		content: string,
+		issues: MigrationIssue[],
+		warnings: MigrationIssue[],
+	): string {
+		return `You are an expert Svelte developer specializing in migrating from Svelte 4 to Svelte 5. 
 
 I need you to analyze this Svelte file and provide specific, actionable migration suggestions.
 
 **File:** ${filename}
 
 **Detected Issues:**
-${issues.map(issue => `- Line ${issue.line}: ${issue.message}`).join('\n')}
+${issues.map((issue) => `- Line ${issue.line}: ${issue.message}`).join('\n')}
 
 **Detected Warnings:**
-${warnings.map(warning => `- Line ${warning.line}: ${warning.message}`).join('\n')}
+${warnings.map((warning) => `- Line ${warning.line}: ${warning.message}`).join('\n')}
 
 **File Content:**
 \`\`\`svelte
@@ -77,39 +86,41 @@ Focus on:
 - Converting createEventDispatcher to callback props
 - Using runes ($state, $derived, $effect) effectively
 
-Format your response as a numbered list of actionable suggestions. Be specific about line numbers and exact code changes.`
-  }
+Format your response as a numbered list of actionable suggestions. Be specific about line numbers and exact code changes.`;
+	}
 
-  private parseClaudeSuggestions(response: string): string[] {
-    // Split Claude's response into individual suggestions
-    const lines = response.split('\n').filter(line => line.trim())
-    const suggestions: string[] = []
-    let currentSuggestion = ''
+	private parseClaudeSuggestions(response: string): string[] {
+		// Split Claude's response into individual suggestions
+		const lines = response.split('\n').filter((line) => line.trim());
+		const suggestions: string[] = [];
+		let currentSuggestion = '';
 
-    for (const line of lines) {
-      // Look for numbered list items or bullet points
-      if (/^\d+\./.test(line.trim()) || /^[-*]/.test(line.trim())) {
-        if (currentSuggestion) {
-          suggestions.push(currentSuggestion.trim())
-        }
-        currentSuggestion = line.trim()
-      } else if (line.trim()) {
-        currentSuggestion += ' ' + line.trim()
-      }
-    }
+		for (const line of lines) {
+			// Look for numbered list items or bullet points
+			if (/^\d+\./.test(line.trim()) || /^[-*]/.test(line.trim())) {
+				if (currentSuggestion) {
+					suggestions.push(currentSuggestion.trim());
+				}
+				currentSuggestion = line.trim();
+			} else if (line.trim()) {
+				currentSuggestion += ' ' + line.trim();
+			}
+		}
 
-    if (currentSuggestion) {
-      suggestions.push(currentSuggestion.trim())
-    }
+		if (currentSuggestion) {
+			suggestions.push(currentSuggestion.trim());
+		}
 
-    return suggestions.filter(s => s.length > 10) // Filter out very short suggestions
-  }
+		return suggestions.filter((s) => s.length > 10); // Filter out very short suggestions
+	}
 
-  async getSvelteComponentSuggestions(componentContent: string): Promise<{
-    modernizedCode: string;
-    migrationSteps: string[];
-  }> {
-    const prompt = `You are a Svelte 5 migration expert. Convert this Svelte 4 component to modern Svelte 5 syntax.
+	async getSvelteComponentSuggestions(
+		componentContent: string,
+	): Promise<{
+		modernizedCode: string;
+		migrationSteps: string[];
+	}> {
+		const prompt = `You are a Svelte 5 migration expert. Convert this Svelte 4 component to modern Svelte 5 syntax.
 
 **Original Component:**
 \`\`\`svelte
@@ -138,46 +149,60 @@ Format as:
 **MIGRATION STEPS:**
 1. [step 1]
 2. [step 2]
-...`
+...`;
 
-    try {
-      const response = await this.client.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 6000,
-        temperature: 0.1,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
+		try {
+			const response = await this.client.messages.create({
+				model: 'claude-3-5-sonnet-20241022',
+				max_tokens: 6000,
+				temperature: 0.1,
+				messages: [
+					{
+						role: 'user',
+						content: prompt,
+					},
+				],
+			});
 
-      const responseText = response.content[0].type === 'text' ? response.content[0].text : ''
-      return this.parseModernizationResponse(responseText)
+			const responseText =
+				response.content[0].type === 'text'
+					? response.content[0].text
+					: '';
+			return this.parseModernizationResponse(responseText);
+		} catch (error) {
+			console.error('Anthropic API error:', error);
+			throw new Error(
+				`Failed to get component suggestions: ${error}`,
+			);
+		}
+	}
 
-    } catch (error) {
-      console.error('Anthropic API error:', error)
-      throw new Error(`Failed to get component suggestions: ${error}`)
-    }
-  }
+	private parseModernizationResponse(response: string): {
+		modernizedCode: string;
+		migrationSteps: string[];
+	} {
+		const modernizedCodeMatch = response.match(
+			/\*\*MODERNIZED CODE:\*\*[\s\S]*?```svelte\n([\s\S]*?)\n```/,
+		);
+		const modernizedCode = modernizedCodeMatch
+			? modernizedCodeMatch[1].trim()
+			: '';
 
-  private parseModernizationResponse(response: string): {
-    modernizedCode: string;
-    migrationSteps: string[];
-  } {
-    const modernizedCodeMatch = response.match(/\*\*MODERNIZED CODE:\*\*[\s\S]*?```svelte\n([\s\S]*?)\n```/)
-    const modernizedCode = modernizedCodeMatch ? modernizedCodeMatch[1].trim() : ''
+		const migrationStepsMatch = response.match(
+			/\*\*MIGRATION STEPS:\*\*\n([\s\S]*)/,
+		);
+		const migrationStepsText = migrationStepsMatch
+			? migrationStepsMatch[1]
+			: '';
 
-    const migrationStepsMatch = response.match(/\*\*MIGRATION STEPS:\*\*\n([\s\S]*)/)
-    const migrationStepsText = migrationStepsMatch ? migrationStepsMatch[1] : ''
-    
-    const migrationSteps = migrationStepsText
-      .split('\n')
-      .filter(line => /^\d+\./.test(line.trim()))
-      .map(line => line.trim())
+		const migrationSteps = migrationStepsText
+			.split('\n')
+			.filter((line) => /^\d+\./.test(line.trim()))
+			.map((line) => line.trim());
 
-    return {
-      modernizedCode,
-      migrationSteps
-    }
-  }
-} 
+		return {
+			modernizedCode,
+			migrationSteps,
+		};
+	}
+}

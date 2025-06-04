@@ -3,9 +3,9 @@ name: Demo Svelte Migration Action
 on:
   pull_request:
     paths:
-      - "test/**/*.svelte"
-      - "test/**/*.ts"
-      - "test/**/*.js"
+      - 'test/**/*.svelte'
+      - 'test/**/*.ts'
+      - 'test/**/*.js'
 
 jobs:
   svelte-migration-analysis:

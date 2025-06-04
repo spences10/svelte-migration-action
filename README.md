@@ -1,24 +1,34 @@
 # Svelte Migration Analysis Action
 
-[![CI](https://github.com/your-org/svelte-migration-action/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/svelte-migration-action/actions/workflows/ci.yml)
-[![GitHub marketplace](https://img.shields.io/badge/marketplace-svelte--migration--analysis-blue?logo=github)](https://github.com/marketplace/actions/svelte-migration-analysis)
+[![Demo Workflow](https://github.com/spences10/svelte-migration-action/actions/workflows/demo.yml/badge.svg)](https://github.com/spences10/svelte-migration-action/actions/workflows/demo.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A powerful GitHub Action that helps teams migrate from **Svelte 4 to Svelte 5** by analyzing your codebase for deprecated patterns and providing actionable migration guidance. Get automated PR comments with detailed migration recommendations powered by static analysis and optional AI insights.
+A powerful GitHub Action that helps teams migrate from **Svelte 4 to
+Svelte 5** by analysing your codebase for deprecated patterns and
+providing actionable migration guidance. Get automated PR comments
+with detailed migration recommendations powered by static analysis and
+optional AI insights.
 
 ## ✨ Features
 
-- 🔍 **Static Analysis**: Detects Svelte 4 patterns that need updating for Svelte 5
-- 🤖 **AI-Powered Insights**: Optional Claude 4 analysis for detailed migration suggestions
-- 💬 **PR Comments**: Automatic comments on pull requests with detailed findings
-- ⚡ **Fast Analysis**: Built with TypeScript and optimized for large codebases
-- 📊 **Comprehensive Reports**: Issues, warnings, and migration guidance
-- 🎯 **Configurable**: Filter files, set failure conditions, and customize behavior
+- 🔍 **Static Analysis**: Detects Svelte 4 patterns that need updating
+  for Svelte 5
+- 🤖 **AI-Powered Insights**: Optional Claude 4 analysis for detailed
+  migration suggestions
+- 💬 **PR Comments**: Automatic comments on pull requests with
+  detailed findings
+- ⚡ **Fast Analysis**: Built with TypeScript and optimised for large
+  codebases
+- 📊 **Comprehensive Reports**: Issues, warnings, and migration
+  guidance
+- 🎯 **Configurable**: Filter files, set failure conditions, and
+  customise behaviour
 - 🔧 **Zero Config**: Works out of the box with sensible defaults
 
 ## 🚀 Quick Start
 
-Add this to your workflow file (`.github/workflows/svelte-migration.yml`):
+Add this to your workflow file
+(`.github/workflows/svelte-migration.yml`):
 
 ```yaml
 name: Svelte Migration Analysis
@@ -26,9 +36,9 @@ name: Svelte Migration Analysis
 on:
   pull_request:
     paths:
-      - "**/*.svelte"
-      - "**/*.ts"
-      - "**/*.js"
+      - '**/*.svelte'
+      - '**/*.ts'
+      - '**/*.js'
 
 jobs:
   svelte-migration:
@@ -37,26 +47,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Analyze Svelte Migration
-        uses: your-org/svelte-migration-action@v1
+      - name: Analyse Svelte Migration
+        uses: spences10/svelte-migration-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## 🔧 Repository Setup
 
-**Important:** To enable PR comments and full functionality, you need to configure your repository permissions:
+**Important:** To enable PR comments and full functionality, you need
+to configure your repository permissions:
 
 ### Required GitHub Repository Settings
 
-1. **Workflow Permissions** (Settings → Actions → General → Workflow permissions):
+1. **Workflow Permissions** (Settings → Actions → General → Workflow
+   permissions):
 
    - Select **"Read and write permissions"**
-   - ✅ Check **"Allow GitHub Actions to create and approve pull requests"**
+   - ✅ Check **"Allow GitHub Actions to create and approve pull
+     requests"**
 
 2. **Why these permissions are needed:**
-   - **Read and write permissions**: Allows the action to post comments on pull requests
-   - **Create and approve pull requests**: Enables the action to interact with PR comments and reviews
+   - **Read and write permissions**: Allows the action to post
+     comments on pull requests
+   - **Create and approve pull requests**: Enables the action to
+     interact with PR comments and reviews
 
 ### Without these settings enabled:
 
@@ -66,7 +81,8 @@ jobs:
 
 ### Alternative Permission Configuration
 
-If you prefer more granular control, you can add explicit permissions to your workflow:
+If you prefer more granular control, you can add explicit permissions
+to your workflow:
 
 ```yaml
 jobs:
@@ -87,7 +103,8 @@ The action identifies common Svelte 4 patterns that need updating:
 ### 🔴 Breaking Changes (Errors)
 
 - `createEventDispatcher` usage → Use callback props
-- `beforeUpdate`/`afterUpdate` lifecycle hooks → Use `$effect.pre()` and `$effect()`
+- `beforeUpdate`/`afterUpdate` lifecycle hooks → Use `$effect.pre()`
+  and `$effect()`
 - Component instantiation with `new` → Use `mount()` or `hydrate()`
 - `$$props` and `$$restProps` → Use destructuring with `$props()`
 - `$$slots` usage → Use snippet parameters
@@ -108,7 +125,7 @@ The action identifies common Svelte 4 patterns that need updating:
 | Input                  | Description                             | Default                           | Required |
 | ---------------------- | --------------------------------------- | --------------------------------- | -------- |
 | `github-token`         | GitHub token for API access             | `${{ github.token }}`             | No       |
-| `filter-changed-files` | Only analyze files changed in PR        | `true`                            | No       |
+| `filter-changed-files` | Only analyse files changed in PR        | `true`                            | No       |
 | `fail-on-error`        | Fail action if migration issues found   | `false`                           | No       |
 | `fail-on-warning`      | Fail action if migration warnings found | `false`                           | No       |
 | `paths`                | Paths to search for Svelte files        | `src\napp\nlib`                   | No       |
@@ -122,7 +139,7 @@ The action identifies common Svelte 4 patterns that need updating:
 | ---------------- | ---------------------------------- |
 | `issues-found`   | Number of migration issues found   |
 | `warnings-found` | Number of migration warnings found |
-| `files-analyzed` | Number of files analyzed           |
+| `files-analyzed` | Number of files analysed           |
 | `has-issues`     | Whether any issues were found      |
 | `summary`        | Summary of the analysis            |
 
@@ -131,8 +148,8 @@ The action identifies common Svelte 4 patterns that need updating:
 ### Custom Paths
 
 ```yaml
-- name: Analyze Svelte Migration
-  uses: your-org/svelte-migration-action@v1
+- name: Analyse Svelte Migration
+  uses: spences10/svelte-migration-action@v1
   with:
     paths: |
       src/components
@@ -149,8 +166,8 @@ The action identifies common Svelte 4 patterns that need updating:
 ### Strict Mode (Fail on Issues)
 
 ```yaml
-- name: Analyze Svelte Migration
-  uses: your-org/svelte-migration-action@v1
+- name: Analyse Svelte Migration
+  uses: spences10/svelte-migration-action@v1
   with:
     fail-on-error: true
     fail-on-warning: true
@@ -159,8 +176,8 @@ The action identifies common Svelte 4 patterns that need updating:
 ### AI-Powered Analysis
 
 ```yaml
-- name: Analyze Svelte Migration
-  uses: your-org/svelte-migration-action@v1
+- name: Analyse Svelte Migration
+  uses: spences10/svelte-migration-action@v1
   with:
     anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
     enable-ai-analysis: true
@@ -170,7 +187,8 @@ The action identifies common Svelte 4 patterns that need updating:
 
 For enhanced migration suggestions powered by Claude 4:
 
-1. Get an Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
+1. Get an Anthropic API key from
+   [console.anthropic.com](https://console.anthropic.com)
 2. Add it to your repository secrets as `ANTHROPIC_API_KEY`
 3. Enable AI analysis in your workflow:
 
@@ -185,13 +203,13 @@ The AI will provide:
 - Detailed code transformation examples
 - Context-aware migration suggestions
 - Best practices for Svelte 5 patterns
-- Performance optimization tips
+- Performance optimisation tips
 
 ## 📊 Example Output
 
 When the action runs, it will:
 
-1. **Analyze your Svelte files** for migration patterns
+1. **Analyse your Svelte files** for migration patterns
 2. **Generate a detailed report** with line-by-line findings
 3. **Post a PR comment** with actionable recommendations
 
@@ -202,7 +220,7 @@ When the action runs, it will:
 
 ## 📊 Summary
 
-- **Files analyzed:** 15
+- **Files analysed:** 15
 - **Issues found:** 3
 - **Warnings found:** 8
 
@@ -214,7 +232,8 @@ These are breaking changes that must be addressed for Svelte 5:
 <summary>📄 <code>src/components/Modal.svelte</code> - 1 issue</summary>
 
 - **Line 15:** createEventDispatcher is deprecated in Svelte 5
-  - 💡 **Suggestion:** Use callback props instead of createEventDispatcher
+  - 💡 **Suggestion:** Use callback props instead of
+    createEventDispatcher
 
 </details>
 
@@ -224,7 +243,8 @@ These are breaking changes that must be addressed for Svelte 5:
 - **Line 23:** beforeUpdate/afterUpdate are deprecated in Svelte 5
   - 💡 **Suggestion:** Use $effect.pre() and $effect() instead
 - **Line 30:** $$props and $$restProps are deprecated
-  - 💡 **Suggestion:** Use destructuring with rest in $props(): let { foo, ...rest } = $props()
+  - 💡 **Suggestion:** Use destructuring with rest in $props(): let {
+    foo, ...rest } = $props()
 
 </details>
 
@@ -237,9 +257,12 @@ These patterns will still work but are deprecated in Svelte 5:
 
 - **Line 5:** export let should be replaced with $props()
   - 💡 **Suggestion:** Replace with: let { propName } = $props()
-- **Line 10:** Reactive statement ($:) should be replaced with $derived or $effect
-  - 💡 **Suggestion:** Use $derived for computed values or $effect for side effects
-- **Line 22:** on: event directives should be replaced with event properties
+- **Line 10:** Reactive statement ($:) should be replaced with
+  $derived or $effect
+  - 💡 **Suggestion:** Use $derived for computed values or $effect for
+    side effects
+- **Line 22:** on: event directives should be replaced with event
+  properties
   - 💡 **Suggestion:** Replace on:click with onclick
 
 </details>
@@ -250,14 +273,16 @@ These patterns will still work but are deprecated in Svelte 5:
 - **Line 8:** export let should be replaced with $props()
   - 💡 **Suggestion:** Replace with: let { propName } = $props()
 - **Line 15:** Named slots should be replaced with snippets
-  - 💡 **Suggestion:** Use {#snippet name()} and {@render name()} instead
+  - 💡 **Suggestion:** Use {#snippet name()} and {@render name()}
+    instead
 
 </details>
 
 ## 📚 Migration Resources
 
 - [Svelte 5 Migration Guide](https://svelte.dev/docs/svelte/v5-migration-guide)
-- [Automatic Migration Tool](https://svelte.dev/docs/svelte/v5-migration-guide#migration-script): `npx sv migrate svelte-5`
+- [Automatic Migration Tool](https://svelte.dev/docs/svelte/v5-migration-guide#migration-script):
+  `npx sv migrate svelte-5`
 - [Svelte 5 Documentation](https://svelte.dev/docs/svelte)
 ```
 
@@ -267,59 +292,63 @@ These patterns will still work but are deprecated in Svelte 5:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/svelte-migration-action.git
+git clone https://github.com/spences10/svelte-migration-action.git
 cd svelte-migration-action
 
 # Install dependencies
-npm install
+pnpm install
 
 # Run tests
-npm test
+pnpm test
 
 # Build the action
-npm run build
+pnpm build
 
 # Package for distribution
-npm run package
+pnpm package
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run tests with coverage
-npm run test:coverage
+pnpm test:coverage
 
 # Run linting
-npm run lint
+pnpm lint
 
 # Format code
-npm run format
+pnpm format
 ```
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our
+[Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
+2. Create your feature branch:
+   `git checkout -b feature/amazing-feature`
 3. Make your changes and add tests
-4. Ensure all tests pass: `npm test`
+4. Ensure all tests pass: `pnpm test`
 5. Commit your changes: `git commit -m 'Add amazing feature'`
 6. Push to the branch: `git push origin feature/amazing-feature`
 7. Open a Pull Request
 
-## 📄 License
+## 📄 Licence
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT Licence - see the
+[LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🙏 Acknowledgements
 
-- Inspired by [svelte-check-action](https://github.com/ghostdevv/svelte-check-action)
+- Inspired by
+  [svelte-check-action](https://github.com/ghostdevv/svelte-check-action)
 - Built with love for the Svelte community
 
 ## 🔗 Related Projects
