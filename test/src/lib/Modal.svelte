@@ -1,17 +1,17 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-	
+
 	export let isOpen = false;
 	export let title = 'Modal';
-	
+
 	const dispatch = createEventDispatcher();
-	
+
 	$: if (isOpen) {
 		document.body.style.overflow = 'hidden';
 	} else {
 		document.body.style.overflow = '';
 	}
-	
+
 	function close() {
 		dispatch('close');
 	}
@@ -39,7 +39,7 @@
 		height: 100%;
 		background: rgba(0, 0, 0, 0.5);
 	}
-	
+
 	.modal {
 		position: absolute;
 		top: 50%;
@@ -49,8 +49,8 @@
 		padding: 2rem;
 		border-radius: 8px;
 	}
-	
+
 	.unused-style {
 		color: red;
 	}
-</style> 
+</style>
