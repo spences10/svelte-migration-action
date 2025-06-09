@@ -1,5 +1,8 @@
 packages:
   - .
   - ./test
+
 onlyBuiltDependencies:
   - '@sveltejs/kit'
+  - '@tailwindcss/oxide'
+  - esbuild
