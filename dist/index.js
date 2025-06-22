@@ -30710,10 +30710,10 @@ var SvelteMigrationAnalyser = class {
         suggestion: "bind:this no longer provides $set, $on, $destroy methods",
         severity: "warning"
       },
-      // Transition modifiers - more specific pattern
+      // Transition modifiers - only actual transitions, not event handlers
       {
         rule: "transition-modifiers",
-        regex: /(in|out|transition):(\w+)\|(?!global)/,
+        regex: /\b(in|out|transition):(\w+)\|(?!global)/,
         message: "Transition modifiers may need |global in Svelte 5",
         suggestion: "Transitions are local by default, add |global if needed",
         severity: "warning"
