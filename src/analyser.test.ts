@@ -125,10 +125,10 @@ describe('SvelteMigrationAnalyser', () => {
 				content,
 			);
 
-			expect(result.issues).toHaveLength(3); // Import line has both, plus two function calls
-			expect(result.issues[0]).toMatchObject({
+			expect(result.warnings).toHaveLength(3); // Import line has both, plus two function calls
+			expect(result.warnings[0]).toMatchObject({
 				rule: 'lifecycle-hooks',
-				severity: 'error',
+				severity: 'warning',
 				message:
 					'beforeUpdate/afterUpdate are deprecated in Svelte 5',
 			});

@@ -164,7 +164,7 @@ export class SvelteMigrationAnalyser {
 				severity: 'warning' as const,
 			},
 
-			// Event handlers with on: directive
+			// Event handlers with on: directive - still works but recommended to migrate
 			{
 				rule: 'on-directive',
 				regex: /\son:(\w+)=/,
@@ -194,20 +194,20 @@ export class SvelteMigrationAnalyser {
 				severity: 'error' as const,
 			},
 
-			// beforeUpdate/afterUpdate
+			// beforeUpdate/afterUpdate - shimmed but deprecated
 			{
 				rule: 'lifecycle-hooks',
 				regex: /\b(beforeUpdate|afterUpdate)\b/,
 				message:
 					'beforeUpdate/afterUpdate are deprecated in Svelte 5',
 				suggestion: 'Use $effect.pre() and $effect() instead',
-				severity: 'error' as const,
+				severity: 'warning' as const,
 			},
 
-			// Store subscriptions
+			// Store subscriptions - only flag if it's not a rune
 			{
 				rule: 'store-subscription',
-				regex: /\$(\w+)\s*=/,
+				regex: /\$(?!state|derived|effect|props|inspect)(\w+)\s*=/,
 				message:
 					'Store auto-subscriptions with $ prefix may need to be updated',
 				suggestion: 'Consider using $state for reactive variables',
@@ -234,10 +234,10 @@ export class SvelteMigrationAnalyser {
 				severity: 'warning' as const,
 			},
 
-			// Transition modifiers
+			// Transition modifiers - more specific pattern
 			{
 				rule: 'transition-modifiers',
-				regex: /\w+:\w+\|/,
+				regex: /(in|out|transition):(\w+)\|(?!global)/,
 				message: 'Transition modifiers may need |global in Svelte 5',
 				suggestion:
 					'Transitions are local by default, add |global if needed',
@@ -301,6 +301,60 @@ export class SvelteMigrationAnalyser {
 				message: 'svelte:fragment should be replaced with snippets',
 				suggestion:
 					'Use {#snippet} blocks instead of svelte:fragment',
+				severity: 'warning' as const,
+			},
+
+			// SvelteComponent class usage
+			{
+				rule: 'svelte-component-class',
+				regex: /SvelteComponent/,
+				message: 'SvelteComponent class is deprecated in Svelte 5',
+				suggestion: 'Use Component type instead for typing',
+				severity: 'error' as const,
+			},
+
+			// tick() function - now async
+			{
+				rule: 'tick-function',
+				regex: /\btick\(\)/,
+				message: 'tick() is now async in Svelte 5',
+				suggestion: 'Use await tick() or tick().then()',
+				severity: 'warning' as const,
+			},
+
+			// Component.$set() method calls
+			{
+				rule: 'component-set-method',
+				regex: /\.\$set\(/,
+				message: 'Component.$set() method is deprecated',
+				suggestion: 'Pass props directly to components instead',
+				severity: 'error' as const,
+			},
+
+			// Component.$on() method calls
+			{
+				rule: 'component-on-method',
+				regex: /\.\$on\(/,
+				message: 'Component.$on() method is deprecated',
+				suggestion: 'Use callback props instead of $on',
+				severity: 'error' as const,
+			},
+
+			// Component.$destroy() method calls
+			{
+				rule: 'component-destroy-method',
+				regex: /\.\$destroy\(/,
+				message: 'Component.$destroy() method is deprecated',
+				suggestion: 'Use unmount() function instead',
+				severity: 'error' as const,
+			},
+
+			// Dispatch function calls
+			{
+				rule: 'dispatch-function-call',
+				regex: /dispatch\(['"`](\w+)['"`]/,
+				message: 'Event dispatching should use callback props',
+				suggestion: 'Replace dispatch with callback props',
 				severity: 'warning' as const,
 			},
 		];

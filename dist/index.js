@@ -30655,7 +30655,7 @@ var SvelteMigrationAnalyser = class {
         suggestion: "Replace with: let { propName } = $props()",
         severity: "warning"
       },
-      // Event handlers with on: directive
+      // Event handlers with on: directive - still works but recommended to migrate
       {
         rule: "on-directive",
         regex: /\son:(\w+)=/,
@@ -30679,18 +30679,18 @@ var SvelteMigrationAnalyser = class {
         suggestion: "Use callback props instead of createEventDispatcher",
         severity: "error"
       },
-      // beforeUpdate/afterUpdate
+      // beforeUpdate/afterUpdate - shimmed but deprecated
       {
         rule: "lifecycle-hooks",
         regex: /\b(beforeUpdate|afterUpdate)\b/,
         message: "beforeUpdate/afterUpdate are deprecated in Svelte 5",
         suggestion: "Use $effect.pre() and $effect() instead",
-        severity: "error"
+        severity: "warning"
       },
-      // Store subscriptions
+      // Store subscriptions - only flag if it's not a rune
       {
         rule: "store-subscription",
-        regex: /\$(\w+)\s*=/,
+        regex: /\$(?!state|derived|effect|props|inspect)(\w+)\s*=/,
         message: "Store auto-subscriptions with $ prefix may need to be updated",
         suggestion: "Consider using $state for reactive variables",
         severity: "warning"
@@ -30711,10 +30711,10 @@ var SvelteMigrationAnalyser = class {
         suggestion: "bind:this no longer provides $set, $on, $destroy methods",
         severity: "warning"
       },
-      // Transition modifiers
+      // Transition modifiers - more specific pattern
       {
         rule: "transition-modifiers",
-        regex: /\w+:\w+\|/,
+        regex: /(in|out|transition):(\w+)\|(?!global)/,
         message: "Transition modifiers may need |global in Svelte 5",
         suggestion: "Transitions are local by default, add |global if needed",
         severity: "warning"
@@ -30766,12 +30766,60 @@ var SvelteMigrationAnalyser = class {
         message: "svelte:fragment should be replaced with snippets",
         suggestion: "Use {#snippet} blocks instead of svelte:fragment",
         severity: "warning"
+      },
+      // SvelteComponent class usage
+      {
+        rule: "svelte-component-class",
+        regex: /SvelteComponent/,
+        message: "SvelteComponent class is deprecated in Svelte 5",
+        suggestion: "Use Component type instead for typing",
+        severity: "error"
+      },
+      // tick() function - now async
+      {
+        rule: "tick-function",
+        regex: /\btick\(\)/,
+        message: "tick() is now async in Svelte 5",
+        suggestion: "Use await tick() or tick().then()",
+        severity: "warning"
+      },
+      // Component.$set() method calls
+      {
+        rule: "component-set-method",
+        regex: /\.\$set\(/,
+        message: "Component.$set() method is deprecated",
+        suggestion: "Pass props directly to components instead",
+        severity: "error"
+      },
+      // Component.$on() method calls
+      {
+        rule: "component-on-method",
+        regex: /\.\$on\(/,
+        message: "Component.$on() method is deprecated",
+        suggestion: "Use callback props instead of $on",
+        severity: "error"
+      },
+      // Component.$destroy() method calls
+      {
+        rule: "component-destroy-method",
+        regex: /\.\$destroy\(/,
+        message: "Component.$destroy() method is deprecated",
+        suggestion: "Use unmount() function instead",
+        severity: "error"
+      },
+      // Dispatch function calls
+      {
+        rule: "dispatch-function-call",
+        regex: /dispatch\(['"`](\w+)['"`]/,
+        message: "Event dispatching should use callback props",
+        suggestion: "Replace dispatch with callback props",
+        severity: "warning"
       }
     ];
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/tslib.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/tslib.mjs
 function __classPrivateFieldSet(receiver, state, value, kind, f) {
   if (kind === "m")
     throw new TypeError("Private method is not writable");
@@ -30789,7 +30837,7 @@ function __classPrivateFieldGet(receiver, state, kind, f) {
   return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/uuid.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/uuid.mjs
 var uuid4 = function() {
   const { crypto } = globalThis;
   if (crypto?.randomUUID) {
@@ -30801,7 +30849,7 @@ var uuid4 = function() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => (+c ^ randomByte() & 15 >> +c / 4).toString(16));
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/errors.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/errors.mjs
 function isAbortError(err) {
   return typeof err === "object" && err !== null && // Spec-compliant fetch implementations
   ("name" in err && err.name === "AbortError" || // Expo fetch
@@ -30832,7 +30880,7 @@ var castToError = (err) => {
   return new Error(err);
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/core/error.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/core/error.mjs
 var AnthropicError = class extends Error {
 };
 var APIError = class _APIError extends AnthropicError {
@@ -30922,7 +30970,7 @@ var RateLimitError = class extends APIError {
 var InternalServerError = class extends APIError {
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/values.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/values.mjs
 var startsWithSchemeRegexp = /^[a-z][a-z0-9+.-]*:/i;
 var isAbsoluteURL = (url) => {
   return startsWithSchemeRegexp.test(url);
@@ -30960,10 +31008,10 @@ var safeJSON = (text) => {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/sleep.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/sleep.mjs
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/log.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/log.mjs
 var levelNumbers = {
   off: 0,
   error: 200,
@@ -31036,10 +31084,10 @@ var formatRequestDetails = (details) => {
   return details;
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/version.mjs
-var VERSION7 = "0.52.0";
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/version.mjs
+var VERSION7 = "0.53.0";
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/detect-platform.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/detect-platform.mjs
 var isRunningInBrowser = () => {
   return (
     // @ts-ignore
@@ -31086,10 +31134,10 @@ var getPlatformProperties = () => {
     return {
       "X-Stainless-Lang": "js",
       "X-Stainless-Package-Version": VERSION7,
-      "X-Stainless-OS": normalizePlatform(globalThis.process.platform),
-      "X-Stainless-Arch": normalizeArch(globalThis.process.arch),
+      "X-Stainless-OS": normalizePlatform(globalThis.process.platform ?? "unknown"),
+      "X-Stainless-Arch": normalizeArch(globalThis.process.arch ?? "unknown"),
       "X-Stainless-Runtime": "node",
-      "X-Stainless-Runtime-Version": globalThis.process.version
+      "X-Stainless-Runtime-Version": globalThis.process.version ?? "unknown"
     };
   }
   const browserInfo = getBrowserInfo();
@@ -31173,7 +31221,7 @@ var getPlatformHeaders = () => {
   return _platformHeaders ?? (_platformHeaders = getPlatformProperties());
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/shims.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/shims.mjs
 function getDefaultFetch() {
   if (typeof fetch !== "undefined") {
     return fetch;
@@ -31245,7 +31293,7 @@ async function CancelReadableStream(stream2) {
   await cancelPromise;
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/request-options.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/request-options.mjs
 var FallbackEncoder = ({ headers, body }) => {
   return {
     bodyHeaders: {
@@ -31255,7 +31303,7 @@ var FallbackEncoder = ({ headers, body }) => {
   };
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/bytes.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/bytes.mjs
 function concatBytes(buffers) {
   let length = 0;
   for (const buffer of buffers) {
@@ -31280,7 +31328,7 @@ function decodeUTF8(bytes) {
   return (decodeUTF8_ ?? (decoder = new globalThis.TextDecoder(), decodeUTF8_ = decoder.decode.bind(decoder)))(bytes);
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/decoders/line.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/decoders/line.mjs
 var _LineDecoder_buffer;
 var _LineDecoder_carriageReturnIndex;
 var LineDecoder = class {
@@ -31357,7 +31405,7 @@ function findDoubleNewlineIndex(buffer) {
   return -1;
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/core/streaming.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/core/streaming.mjs
 var Stream2 = class _Stream {
   constructor(iterator2, controller) {
     this.iterator = iterator2;
@@ -31602,7 +31650,7 @@ function partition(str, delimiter) {
   return [str, "", ""];
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/parse.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/parse.mjs
 async function defaultParseResponse(client, props) {
   const { response, requestLogID, retryOfRequestLogID, startTime } = props;
   const body = await (async () => {
@@ -31648,7 +31696,7 @@ function addRequestID(value, response) {
   });
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/core/api-promise.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/core/api-promise.mjs
 var _APIPromise_client;
 var APIPromise = class _APIPromise extends Promise {
   constructor(client, responsePromise, parseResponse = defaultParseResponse) {
@@ -31711,7 +31759,7 @@ var APIPromise = class _APIPromise extends Promise {
 };
 _APIPromise_client = /* @__PURE__ */ new WeakMap();
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/core/pagination.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/core/pagination.mjs
 var _AbstractPage_client;
 var AbstractPage = class {
   constructor(client, response, body, options) {
@@ -31813,7 +31861,7 @@ var Page = class extends AbstractPage {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/uploads.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/uploads.mjs
 var checkFileSupport = () => {
   if (typeof File === "undefined") {
     const { process: process2 } = globalThis;
@@ -31890,7 +31938,7 @@ var addFormValue = async (form, key, value) => {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/to-file.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/to-file.mjs
 var isBlobLike = (value) => value != null && typeof value === "object" && typeof value.size === "number" && typeof value.type === "string" && typeof value.text === "function" && typeof value.slice === "function" && typeof value.arrayBuffer === "function";
 var isFileLike = (value) => value != null && typeof value === "object" && typeof value.name === "string" && typeof value.lastModified === "number" && isBlobLike(value);
 var isResponseLike = (value) => value != null && typeof value === "object" && typeof value.url === "string" && typeof value.blob === "function";
@@ -31946,14 +31994,14 @@ function propsForError(value) {
   return `; props: [${props.map((p) => `"${p}"`).join(", ")}]`;
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/core/resource.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/core/resource.mjs
 var APIResource = class {
   constructor(client) {
     this._client = client;
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/headers.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/headers.mjs
 var brand_privateNullableHeaders = Symbol.for("brand.privateNullableHeaders");
 var isArray = Array.isArray;
 function* iterateHeaders(headers) {
@@ -32017,7 +32065,7 @@ var buildHeaders = (newHeaders) => {
   return { [brand_privateNullableHeaders]: true, values: targetHeaders, nulls: nullHeaders };
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/path.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/path.mjs
 function encodeURIPath(str) {
   return str.replace(/[^A-Za-z0-9\-._~!$&'()*+,;=:@]+/g, encodeURIComponent);
 }
@@ -32057,7 +32105,7 @@ ${underline}`);
 };
 var path3 = createPathTagFunction(encodeURIPath);
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/beta/files.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/beta/files.mjs
 var Files = class extends APIResource {
   /**
    * List Files
@@ -32170,7 +32218,7 @@ var Files = class extends APIResource {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/beta/models.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/beta/models.mjs
 var Models = class extends APIResource {
   /**
    * Get a specific model.
@@ -32222,7 +32270,7 @@ var Models = class extends APIResource {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/decoders/jsonl.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/decoders/jsonl.mjs
 var JSONLDecoder = class _JSONLDecoder {
   constructor(iterator2, controller) {
     this.iterator = iterator2;
@@ -32254,7 +32302,7 @@ var JSONLDecoder = class _JSONLDecoder {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/beta/messages/batches.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/beta/messages/batches.mjs
 var Batches = class extends APIResource {
   /**
    * Send a batch of Message creation requests.
@@ -32446,7 +32494,7 @@ var Batches = class extends APIResource {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/_vendor/partial-json-parser/parser.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/_vendor/partial-json-parser/parser.mjs
 var tokenize = (input) => {
   let current = 0;
   let tokens = [];
@@ -32666,7 +32714,7 @@ var generate = (tokens) => {
 };
 var partialParse = (input) => JSON.parse(generate(unstrip(strip(tokenize(input)))));
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/lib/BetaMessageStream.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/lib/BetaMessageStream.mjs
 var _BetaMessageStream_instances;
 var _BetaMessageStream_currentMessageSnapshot;
 var _BetaMessageStream_connectedPromise;
@@ -32690,6 +32738,9 @@ var _BetaMessageStream_addStreamEvent;
 var _BetaMessageStream_endRequest;
 var _BetaMessageStream_accumulateMessage;
 var JSON_BUF_PROPERTY = "__json_buf";
+function tracksToolInput(content) {
+  return content.type === "tool_use" || content.type === "server_tool_use" || content.type === "mcp_tool_use";
+}
 var BetaMessageStream = class _BetaMessageStream {
   constructor() {
     _BetaMessageStream_instances.add(this);
@@ -33023,7 +33074,7 @@ var BetaMessageStream = class _BetaMessageStream {
             break;
           }
           case "input_json_delta": {
-            if ((content.type === "tool_use" || content.type === "mcp_tool_use") && content.input) {
+            if (tracksToolInput(content) && content.input) {
               this._emit("inputJson", event.delta.partial_json, content.input);
             }
             break;
@@ -33124,7 +33175,7 @@ var BetaMessageStream = class _BetaMessageStream {
             break;
           }
           case "input_json_delta": {
-            if (snapshotContent?.type === "tool_use" || snapshotContent?.type === "mcp_tool_use") {
+            if (snapshotContent && tracksToolInput(snapshotContent)) {
               let jsonBuf = snapshotContent[JSON_BUF_PROPERTY] || "";
               jsonBuf += event.delta.partial_json;
               Object.defineProperty(snapshotContent, JSON_BUF_PROPERTY, {
@@ -33216,7 +33267,7 @@ var BetaMessageStream = class _BetaMessageStream {
 function checkNever(x) {
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/constants.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/constants.mjs
 var MODEL_NONSTREAMING_TOKENS = {
   "claude-opus-4-20250514": 8192,
   "claude-opus-4-0": 8192,
@@ -33225,7 +33276,7 @@ var MODEL_NONSTREAMING_TOKENS = {
   "claude-opus-4@20250514": 8192
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/beta/messages/messages.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/beta/messages/messages.mjs
 var DEPRECATED_MODELS = {
   "claude-1.3": "November 6th, 2024",
   "claude-1.3-100k": "November 6th, 2024",
@@ -33301,7 +33352,7 @@ Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resour
 };
 Messages.Batches = Batches;
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/beta/beta.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/beta/beta.mjs
 var Beta = class extends APIResource {
   constructor() {
     super(...arguments);
@@ -33314,7 +33365,7 @@ Beta.Models = Models;
 Beta.Messages = Messages;
 Beta.Files = Files;
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/completions.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/completions.mjs
 var Completions = class extends APIResource {
   create(params, options) {
     const { betas, ...body } = params;
@@ -33331,7 +33382,7 @@ var Completions = class extends APIResource {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/lib/MessageStream.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/lib/MessageStream.mjs
 var _MessageStream_instances;
 var _MessageStream_currentMessageSnapshot;
 var _MessageStream_connectedPromise;
@@ -33355,6 +33406,9 @@ var _MessageStream_addStreamEvent;
 var _MessageStream_endRequest;
 var _MessageStream_accumulateMessage;
 var JSON_BUF_PROPERTY2 = "__json_buf";
+function tracksToolInput2(content) {
+  return content.type === "tool_use" || content.type === "server_tool_use";
+}
 var MessageStream = class _MessageStream {
   constructor() {
     _MessageStream_instances.add(this);
@@ -33688,7 +33742,7 @@ var MessageStream = class _MessageStream {
             break;
           }
           case "input_json_delta": {
-            if (content.type === "tool_use" && content.input) {
+            if (tracksToolInput2(content) && content.input) {
               this._emit("inputJson", event.delta.partial_json, content.input);
             }
             break;
@@ -33788,7 +33842,7 @@ var MessageStream = class _MessageStream {
             break;
           }
           case "input_json_delta": {
-            if (snapshotContent?.type === "tool_use") {
+            if (snapshotContent && tracksToolInput2(snapshotContent)) {
               let jsonBuf = snapshotContent[JSON_BUF_PROPERTY2] || "";
               jsonBuf += event.delta.partial_json;
               Object.defineProperty(snapshotContent, JSON_BUF_PROPERTY2, {
@@ -33880,7 +33934,7 @@ var MessageStream = class _MessageStream {
 function checkNever2(x) {
 }
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/messages/batches.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/messages/batches.mjs
 var Batches2 = class extends APIResource {
   /**
    * Send a batch of Message creation requests.
@@ -34021,7 +34075,7 @@ var Batches2 = class extends APIResource {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/messages/messages.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/messages/messages.mjs
 var Messages2 = class extends APIResource {
   constructor() {
     super(...arguments);
@@ -34084,7 +34138,7 @@ var DEPRECATED_MODELS2 = {
 };
 Messages2.Batches = Batches2;
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/resources/models.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/resources/models.mjs
 var Models2 = class extends APIResource {
   /**
    * Get a specific model.
@@ -34121,7 +34175,7 @@ var Models2 = class extends APIResource {
   }
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/internal/utils/env.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/internal/utils/env.mjs
 var readEnv = (env) => {
   if (typeof globalThis.process !== "undefined") {
     return globalThis.process.env?.[env]?.trim() ?? void 0;
@@ -34132,7 +34186,7 @@ var readEnv = (env) => {
   return void 0;
 };
 
-// node_modules/.pnpm/@anthropic-ai+sdk@0.52.0/node_modules/@anthropic-ai/sdk/client.mjs
+// node_modules/.pnpm/@anthropic-ai+sdk@0.53.0/node_modules/@anthropic-ai/sdk/client.mjs
 var _a;
 var _BaseAnthropic_encoder;
 var BaseAnthropic = class {
@@ -34263,7 +34317,7 @@ var BaseAnthropic = class {
     const defaultTimeout = 10 * 60;
     const expectedTimeout = 60 * 60 * maxTokens / 128e3;
     if (expectedTimeout > defaultTimeout) {
-      throw new AnthropicError("Streaming is strongly recommended for operations that may take longer than 10 minutes. See https://github.com/anthropics/anthropic-sdk-python#streaming-responses for more details");
+      throw new AnthropicError("Streaming is strongly recommended for operations that may take longer than 10 minutes. See https://github.com/anthropics/anthropic-sdk-typescript#streaming-responses for more details");
     }
     return defaultTimeout * 1e3;
   }
