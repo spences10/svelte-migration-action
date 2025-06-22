@@ -234,10 +234,10 @@ export class SvelteMigrationAnalyser {
 				severity: 'warning' as const,
 			},
 
-			// Transition modifiers - more specific pattern
+			// Transition modifiers - only actual transitions, not event handlers
 			{
 				rule: 'transition-modifiers',
-				regex: /(in|out|transition):(\w+)\|(?!global)/,
+				regex: /\b(in|out|transition):(\w+)\|(?!global)/,
 				message: 'Transition modifiers may need |global in Svelte 5',
 				suggestion:
 					'Transitions are local by default, add |global if needed',
@@ -284,10 +284,10 @@ export class SvelteMigrationAnalyser {
 				severity: 'warning' as const,
 			},
 
-			// Event modifiers
+			// Event modifiers - only on: directives, not transitions
 			{
 				rule: 'event-modifiers',
-				regex: /on:\w+\|(\w+)/,
+				regex: /\son:\w+\|(\w+)/,
 				message: 'Event modifiers are deprecated in Svelte 5',
 				suggestion:
 					'Handle event.preventDefault(), event.stopPropagation() etc. in the handler',
