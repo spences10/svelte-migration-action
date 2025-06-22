@@ -1,5 +1,5 @@
 <script>
-	import { afterUpdate, beforeUpdate, createEventDispatcher } from 'svelte';
+	import { afterUpdate, beforeUpdate, createEventDispatcher, tick } from 'svelte';
 
 	// Deprecated: createEventDispatcher
 	const dispatch = createEventDispatcher();
@@ -23,10 +23,33 @@
 		console.log('After update');
 	});
 
-	function handleClick() {
+	// Testing store subscription pattern (should NOT be flagged)
+	let myState = $state(0);
+	let computed = $derived(myState * 2);
+
+	// This should be flagged as problematic store usage
+	let $someStore = writable(0);
+
+	async function handleClick() {
 		count += 1;
 		// Deprecated: createEventDispatcher
 		dispatch('increment', { count });
+		
+		// This should trigger the tick warning
+		tick();
+		
+		// This should be flagged
+		setTimeout(() => {
+			tick();
+		}, 100);
+	}
+
+	// Component method usage (should be flagged)
+	let componentRef;
+	function testComponentMethods() {
+		componentRef.$set({ title: 'New Title' });
+		componentRef.$on('event', handler);
+		componentRef.$destroy();
 	}
 </script>
 
