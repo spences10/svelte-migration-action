@@ -284,10 +284,10 @@ export class SvelteMigrationAnalyser {
 				severity: 'warning' as const,
 			},
 
-			// Event modifiers
+			// Event modifiers - only on: directives, not transitions
 			{
 				rule: 'event-modifiers',
-				regex: /on:\w+\|(\w+)/,
+				regex: /\son:\w+\|(\w+)/,
 				message: 'Event modifiers are deprecated in Svelte 5',
 				suggestion:
 					'Handle event.preventDefault(), event.stopPropagation() etc. in the handler',
