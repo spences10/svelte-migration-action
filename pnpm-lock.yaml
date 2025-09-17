@@ -15,8 +15,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@anthropic-ai/sdk':
-        specifier: ^0.53.0
-        version: 0.53.0
+        specifier: ^0.62.0
+        version: 0.62.0
       '@changesets/cli':
         specifier: ^2.29.5
         version: 2.29.7(@types/node@22.15.30)
@@ -159,8 +159,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@anthropic-ai/sdk@0.53.0':
-    resolution: {integrity: sha512-bl2frVo0cgHCXTzQEIHXPH329uQXC4YKBaLBkZmUc59tNiR3GgcGpBZU7mwfyv5tPuU/yT7tGHyoe5AnjN02QA==}
+  '@anthropic-ai/sdk@0.62.0':
+    resolution: {integrity: sha512-gT2VFKX0gSp7KJNlav/vzRFjJOPYDZxCJRx7MYUc+fqURc5aS6OI/UJeD2KytJkjsIWv0OOwH1ePc1S5QE2GZw==}
     hasBin: true
 
   '@asamuzakjp/css-color@3.2.0':
@@ -3368,7 +3368,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@anthropic-ai/sdk@0.53.0': {}
+  '@anthropic-ai/sdk@0.62.0': {}
 
   '@asamuzakjp/css-color@3.2.0':
     dependencies:
